@@ -1,2 +1,15 @@
 ---
-# tasks file for common
+
+- name: Install EPEL repositpry
+  yum:
+    name: epel-release
+    state: present
+
+- name: Enshure EPEL repo is enabled
+  ini_file:
+    dest: /etc/yum.repos.d/epel.repo
+    section: epel
+    option: enable
+    value: '1'
+
+

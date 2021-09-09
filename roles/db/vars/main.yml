@@ -1,2 +1,5 @@
 ---
 # vars file for db
+db_name: leto-db
+db_user: leto
+db_pass: '1qaz@WSX'

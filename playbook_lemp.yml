@@ -1,11 +1,23 @@
 ---
 
-- hosts: lemp
+- hosts: webservers
   remote_user: kate
   become: yes
 
   roles:
-    - common
     - web
+
+- hosts: dbserver
+  remote_user: kate
+  become: yes
+
+  roles:
     - db
+
+- hosts: haproxy
+  remote_users: kate
+  become: yes
+
+  roles:
+    - haproxy
 
