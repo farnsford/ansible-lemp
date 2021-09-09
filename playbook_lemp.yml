@@ -1,0 +1,44 @@
+--------
+- hosts: all
+  become: yes
+  vars:
+    - install_packages: [ "nginx", "php-fpm", "mysql-server", "python3-pymysql" ]
+    - http_port: 80
+    - http_host: "{{ ansible_facts.eth0.ipv4.address }}"
+  tasks:
+    - name: Update cache and Install Required Packages
+      apt:
+        name: "{{ install_packages }}"
+        state: latest
+        update_cache: yes
+
+    - name: Removes anonymous MySQL accounts
+      mysql_user:
+        name: ''
+        host_all: yes
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      no_log: true
+
+    - name: Allow access on port 80
+      ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+
+    - name: Set Up Nginx default site
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/default
+      notify: restart nginx
+
+    - name: Set Up php test page
+      template:
+        src: phpinfo.php.j2
+        dest: /var/www/html/info.php
+
+  handlers:
+    - name: restart nginx 
+      service:
+        name: nginx
+        state: restarted

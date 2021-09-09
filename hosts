@@ -1,0 +1,13 @@
+[all:vars]
+ansible_connection=ssh 
+ansible_user=kate
+
+[webservers]
+192.168.0.110
+192.168.0.111
+
+[dbserver]
+192.168.0.109
+
+[haproxy]
+192.168.0.108
