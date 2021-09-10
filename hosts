@@ -9,5 +9,10 @@ ansible_user=kate
 [dbserver]
 192.168.0.109
 
+[dbserver:vars]
+db_name=leto
+db_user=leto
+db_pass=1qaz@WSX
+
 [haproxy]
 192.168.0.108
