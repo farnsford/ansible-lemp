@@ -6,6 +6,7 @@
 
   roles:
     - web
+    - firewall
 
 - hosts: dbserver
   remote_user: kate
