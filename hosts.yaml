@@ -2,10 +2,19 @@
 webservers:
   hosts:
     192.168.1.110:
+      vars:
+        server_hostname: wp-node1
     192.168.1.111:
       vars:
-        ansible_connection: ssh
-        ansible_user: kate
+        server_hostname: wp-node2
+    vars:
+      ansible_connection: ssh
+      ansible_user: kate
+      db_host: 192.168.1.109
+      wordpress_parent_path: /var/www/
+      wordpress_path: "{{ wordpress_parent_path }}/wordpress"
+      wordpress_owner: root
+      wordpress_group: root
 dbservers:
   hosts:  
     192.168.1.109:
@@ -16,6 +25,7 @@ dbservers:
         db_user: leto
         db_pass: 1qaz@WSX
         root_pass: 1qaz@WSX
+        wordpress_version: 5.8.1
 haproxy:
   hosts:
     192.168.1.108:

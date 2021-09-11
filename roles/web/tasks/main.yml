@@ -1,37 +1,77 @@
 ---
 
-- name: Update apt cache
-  yum: update_cache=yes cache_valid_time=3600
-  become: yes
+- name: Disable SELinux Permanently (Reboot Required)
+  selinux: state=disabled
+ 
+- name: Disable SELinux Without Reboot
+  command: /sbin/setenforce 0
 
 - name: Install Nginx
-  yum:
-    name: nginx
-    stat: latest
+  yum: name=nginx state=latest
+  become: yes
 
-- name: Install PHP-FRM
-  yum:
-    name: ['php','php-frm','php-common'.'php-cli','php-curl']
-    state: latest
+- name: Install PHP-FPM
+  yum: name={{ item }} state=present
+  with_items:
+    - php 
+    - php-fpm
+    - php-common
+    - php-cli
+    - php-curl
+    - php-mysql
+    - php-zip
 
 - name: Start nginx
   become: yes
   service:
     name: nginx
     state: started
+    
+- name: Nginx service state
+  service: name=nginx state=started enabled=yes
 
-- name: Update nginx confs for WordPress + PHP
-  template: "src=../templates/default-site.conf dest=/etc/nginx/sites-available/{{server_hostname}} owner=www-data group=www-data mode=0644"
-  become: yes
+- name: Check if "default.conf" target exists
+  stat: path=/etc/nginx/conf.d/default.conf
+  register: filecheck
 
-- name: Enable site
-  file: src=/etc/nginx/sites-available/{{server_hostname}} dest=/etc/nginx/sites-enabled/{{server_hostname}} owner=www-data group=www-data state=link
-  notify:
-    - restart nginx
-  become: yes
+- name: Remove "default.conf", if any
+  file: path=/etc/nginx/conf.d/default.conf state=absent
+  when: filecheck.stat.exists
 
-- name: Add php settings
-  template: src=../../web/templates/nginx-wp.conf dest=/etc/nginx/nginx-wp.conf owner=www-data group=www-data mode=0644
-  notify:
-    - restart nginx
-  become: yes
+- name: Copy wordpress site conf for nginx
+  template:
+    src: ./templates/nginx-wordpress.conf.j2
+    dest: /etc/nginx/conf.d/nginx-wordpress.conf
+  notify: restart nginx
+
+- name: Download wordpress tarball
+  get_url:
+    url: "https://ru.wordpress.org/wordpress-{{ wordpress_version }}-ru_RU.tar.gz"
+    dest: /tmp/
+
+- name: Extract wordpress tarball
+  unarchive:
+    src: "/tmp/wordpress-{{ wordpress_version }}-ru_RU.tar.gz"
+    dest: "{{ wordpress_parent_path }}"
+    owner: "{{ wordpress_owner }}"
+    group: "{{ wordpress_group }}"
+    copy: no
+
+- name: Install prerequisite for Ansible's mysql modules
+  yum: name=MySQL-python state=present
+
+- name: Set wordpress config
+  template:
+    src: ./templates/wp-config.php.j2
+    dest: "{{ wordpress_path }}/wp-config.php"
+    owner: "{{ wordpress_owner }}"
+    group: "{{ wordpress_group }}"
+  notify: restart nginx
+
+- service: name=nginx state=restarted
+
+- name: Configure Firewall
+  firewalld: zone=public service=http permanent=yes state=enabled
+ 
+- name: Reload Firewall
+  systemd: name=firewalld state=reloaded

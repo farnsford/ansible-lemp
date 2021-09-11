@@ -1,24 +1,21 @@
 ---
 
 - hosts: webservers
-  remote_user: kate
   become: yes
-
   roles:
+    - common
     - web
-    - firewall
+
 
 - hosts: dbserver
-  remote_user: kate
   become: yes
-
   roles:
+    - common
     - db
 
 - hosts: haproxy
-  remote_users: kate
   become: yes
-
   roles:
+    - common
     - haproxy
 

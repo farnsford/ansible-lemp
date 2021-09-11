@@ -1,18 +1,18 @@
 ---
 - name: Install MySQL
-  apt:
+  yum:
     name: ['mysql-server','mysql-client','python-mysqldb']
     state: latest
   notify: restart mysql
 
 - name: Set MySQL root Password
-      mysql_user:
-        login_host: 'localhost'
-        login_user: 'root'
-        login_password: ''
-        name: 'root'
-        password: '{{ root_pass }}'
-        state: present
+  mysql_user:
+    login_host: 'localhost'
+    login_user: 'root'
+    login_password: ''
+    name: 'root'
+    password: '{{ root_pass }}'
+    state: present
 
 - name: Create database
   mysql_db:
@@ -26,3 +26,6 @@
     encrypted: yes
     priv: '{{ db_name }}.*:ALL'
     state: present
+
+- name: insert firewalld rule
+  firewalld: port=3306/tcp permanent=true state=enabled immediate=yes

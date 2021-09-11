@@ -1,2 +1,21 @@
 ---
 # tasks file for haproxy
+
+- name: Install the haproxy packages
+  yum: name={{ item }} state=present
+  with_items:
+    - haproxy
+
+- name: Configure haproxy cnf files with hosts
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+  notify: restart haproxy
+
+- name: Enable haproxy in /etc/default/haproxy
+  template: src=default-haproxy dest=/etc/default/haproxy
+  notify: restart haproxy
+  
+- name: Configure Firewall
+  firewalld: zone=public service=http permanent=yes state=enabled
+ 
+- name: Reload Firewall
+  systemd: name=firewalld state=reloaded
