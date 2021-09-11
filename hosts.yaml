@@ -15,6 +15,7 @@ dbservers:
         db_name: leto
         db_user: leto
         db_pass: 1qaz@WSX
+        root_pass: 1qaz@WSX
 haproxy:
   hosts:
     192.168.1.108:
