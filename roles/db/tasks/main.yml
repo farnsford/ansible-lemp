@@ -1,9 +1,41 @@
 ---
-- name: Install MySQL
+- name: Install MySQL repository
   yum:
-    name: ['mysql-server','mysql-client','python-mysqldb']
-    state: latest
-  notify: restart mysql
+    name: "https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm"
+    state: present
+
+- name: Disable MySQL 8.0 repository
+  shell: yum-config-manager --disable mysql80-community
+  
+- name: Enable MySQL 5.7 repository
+  shell: yum-config-manager --enable mysql57-community
+
+#- name: Install package
+#  yum:
+#    name: /tmp/mysql57-community-release-el7.rpm
+#    state: present
+
+- name: Install MySQL packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - mysql-community-server
+      - mysql-community-client
+      - mysqldb-python
+
+#- name: Install MySQL
+#  yum:
+#    name: ['mysql-server','mysql-client','python-mysqldb']
+#    state: latest
+#  notify: restart mysql
+
+- name: Enable the MySQL service
+  service:
+    name: mysqld
+    state: started
+    enabled: true
 
 - name: Set MySQL root Password
   mysql_user:

@@ -1,35 +1,38 @@
 ---
 webservers:
   hosts:
-    192.168.1.110:
-      vars:
-        server_hostname: wp-node1
-    192.168.1.111:
-      vars:
-        server_hostname: wp-node2
-    vars:
+    wp-node1:   
+      ansible_host: 192.168.0.110
+      hostname: wp-node1
+    wp-node2:
+      ansible_host: 192.168.0.111
+      hostname: wp-node2
+  vars:
+    ansible_connection: ssh
+    ansible_user: kate
+    db_host: 192.168.0.109
+    wordpress_version: 5.8.1
+    wordpress_parent_path: /var/www/
+    wordpress_path: "{{ wordpress_parent_path }}/wordpress"
+    wordpress_owner: root
+    wordpress_group: root
+    db_name: leto
+    db_user: leto
+    db_pass: 1qaz@WSX
+dbservers:
+  hosts:
+    dbserver:
+      ansible_host: 192.168.0.109
       ansible_connection: ssh
       ansible_user: kate
-      db_host: 192.168.1.109
-      wordpress_parent_path: /var/www/
-      wordpress_path: "{{ wordpress_parent_path }}/wordpress"
-      wordpress_owner: root
-      wordpress_group: root
-dbservers:
-  hosts:  
-    192.168.1.109:
-      vars:
-        ansible_connection: ssh
-        ansible_user: kate
-        db_name: leto
-        db_user: leto
-        db_pass: 1qaz@WSX
-        root_pass: 1qaz@WSX
-        wordpress_version: 5.8.1
+      db_name: leto
+      db_user: leto
+      db_pass: 1qaz@WSX
+      root_pass: 1qaz@WSX
 haproxy:
   hosts:
-    192.168.1.108:
-      vars:
-        ansible_connection: ssh
-        ansible_user: kate
+    haproxy_1:
+      ansible_host: 192.168.0.108
+      ansible_connection: ssh
+      ansible_user: kate
       

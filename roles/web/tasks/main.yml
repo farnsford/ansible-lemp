@@ -1,25 +1,19 @@
 ---
 
-- name: Disable SELinux Permanently (Reboot Required)
-  selinux: state=disabled
+#- name: Disable SELinux Permanently (Reboot Required)
+#  selinux: state=disabled
  
-- name: Disable SELinux Without Reboot
-  command: /sbin/setenforce 0
+#- name: Disable SELinux Without Reboot
+#  command: /sbin/setenforce 0
 
-- name: Install Nginx
-  yum: name=nginx state=latest
-  become: yes
+#- name: Install Nginx
+#  yum: name=nginx state=latest
+#  become: yes
 
 - name: Install PHP-FPM
-  yum: name={{ item }} state=present
-  with_items:
-    - php 
-    - php-fpm
-    - php-common
-    - php-cli
-    - php-curl
-    - php-mysql
-    - php-zip
+  yum: 
+    name: ['php', 'php-fpm', 'php-common', 'php-cli', 'php-curl', 'php-mysql', 'php-zip']
+    state: present
 
 - name: Start nginx
   become: yes
